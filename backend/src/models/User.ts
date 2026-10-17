@@ -26,4 +26,7 @@ export class User {
 
   @Column({ type: "varchar", length: 9, nullable: true })
   postalCode!: string | null;
+
+  @Column({ type: "int", default: 2 })
+  role!: number;
 }
