@@ -3,9 +3,15 @@ import { User } from "../models/User";
 
 
 
-export class UserService {
-  
+export class UserRepo {
+    private userRepository = AppDataSorce.getRepository(User);
+
     create(user: User) {
-        AppDataSorce.(user)
+        this.userRepository.create(user);
+        return this.userRepository.save(user);
+    }
+
+    findByEmail(email: string) {
+        return this.userRepository.findOneBy({ email });
     }
 }   
