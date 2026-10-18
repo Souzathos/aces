@@ -2,8 +2,18 @@ import "reflect-metadata";
 
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
+import { UBS } from "../models/UBS";
+import { User } from "../models/User";
+import { Attendance } from "../models/Attendance";
+import { Patient } from "../models/Patient";
+import { Doctor } from "../models/Doctor";
+import { Prescription } from "../models/Prescription";
+import { PrescriptionMedication } from "../models/PrescriptionMedication";
+import { MedicalHistory } from "../models/MedicalHistory";
+import { Review } from "../models/Review";
+import { Presence } from "../models/Presence";
 
-dotenv.config()
+dotenv.config();
 
 export const AppDataSorce = new DataSource({
     type: "mysql",
@@ -14,5 +24,16 @@ export const AppDataSorce = new DataSource({
     database: process.env.DB_NAME,
     synchronize: true,
     logging: true,
-    entities: []
-})
+    entities: [
+        UBS,
+        User,
+        Attendance,
+        Patient,
+        Doctor,
+        Prescription,
+        PrescriptionMedication,
+        MedicalHistory,
+        Review,
+        Presence,
+    ],
+});
