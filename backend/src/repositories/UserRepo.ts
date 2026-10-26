@@ -11,11 +11,12 @@ export class UserRepo {
         return this.userRepository.save(user);
     }
 
-    update(id: number, userData: Partial<User>) {
-        return this.userRepository.update(id, userData);
+    async update(id: number, userData: Partial<User>): Promise<User | null> {
+        await this.userRepository.update(id, userData);
+        return this.findById(id);
     }
 
-    delete(id: string) {
+    delete(id: number) {
         this.userRepository.delete(id);
     }
 

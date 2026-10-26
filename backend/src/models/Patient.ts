@@ -22,7 +22,7 @@ export class Patient {
   bloodType!: string | null;
 
   @OneToOne(() => User)
-  @JoinColumn({ name: "cpf", referencedColumnName: "cpf" })
+  @JoinColumn({ name: "id", referencedColumnName: "id" })
   user!: User;
 
   @OneToMany(() => MedicalHistory, (history) => history.patient)

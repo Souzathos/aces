@@ -1,9 +1,9 @@
 
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity("users")
 export class User {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id!: number;
 
   @Column({ length: 14 })
@@ -18,18 +18,18 @@ export class User {
   @Column({ length: 255 })
   password!: string;
 
-  @Column({ length: 20, nullable: true })
+  @Column({ type: "varchar", length: 20, nullable: true })
   phone!: string | null;
 
-  @Column({ length: 150, nullable: true })
+  @Column({ type: "varchar", length: 150, nullable: true })
   address!: string | null;
 
-  @Column({ length: 10, nullable: true })
+  @Column({ type: "varchar", length: 10, nullable: true })
   addressNumber!: string | null;
 
-  @Column({ length: 9, nullable: true })
+  @Column({ type: "varchar", length: 9, nullable: true })
   postalCode!: string | null;
 
-  @Column({ type: "int", default: 2 })
+  @Column({ default: 2 })
   role!: number;
 }

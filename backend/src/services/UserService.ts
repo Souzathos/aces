@@ -1,6 +1,6 @@
 
-import { ConflictError } from "../errors";
-import { UserRoles } from "../models/roles/UserRoles";
+import { ConflictError, NotFoundError } from "../errors";
+import { UserRoles } from "../enums/UserRoles";
 import { User } from "../models/User";
 import { UserRepo } from "../repositories/UserRepo";
 import { hashPassword } from "../utils/PasswordUtils";
@@ -19,10 +19,10 @@ type userDTO = {
 
 const userRepo = new UserRepo();
 
-function passwordHandler(user: User): User {
-     
-    delete (user as any).password;
-    return user
+export type UpdateUserData = Partial<Omit<userDTO, "role">>;
+
+function passwordHandler({ password: _password, ...user }: User): Omit<User, "password"> {
+    return user;
 }
 
 export class UserService {
@@ -51,16 +51,61 @@ export class UserService {
         return passwordHandler(user);
     }
 
-    async update(id: number, userData: Partial<userDTO>) {
+    async update(id: number, userData: UpdateUserData) {
         const userExists = await userRepo.findById(id);
 
         if(!userExists) {
             throw new NotFoundError("User not found");
         }
 
-        const newUser = await userRepo.update(id, userData) 
+        if (userData.email !== undefined && userData.email !== userExists.email) {
+            const emailExists = await userRepo.findByEmail(userData.email);
 
-        return passwordHandler(newUser as any);
+            if (emailExists) {
+                throw new ConflictError("User already exists");
+            }
+        }
+
+        const dataToUpdate = { ...userData };
+        if (dataToUpdate.password !== undefined) {
+            dataToUpdate.password = await hashPassword(dataToUpdate.password);
+        }
+
+        const updatedUser = await userRepo.update(id, dataToUpdate);
+
+        if (!updatedUser) {
+            throw new NotFoundError("User not found");
+        }
+
+        return passwordHandler(updatedUser);
+    }
+
+    async delete(id: number) {
+        const userExists = await userRepo.findById(id);
+
+        if(!userExists) {
+            throw new NotFoundError("User not found");
+        }
+
+        await userRepo.delete(id);
+    }
+
+    async listAll() {
+
+        const users = await userRepo.listAll();
+
+        return users.map((user) => passwordHandler(user));
+    }
+
+    async listById(id: number) {
+
+        const user = await userRepo.findById(id);
+
+        if(!user) {
+            throw new NotFoundError("User not found");
+        }
+
+        return passwordHandler(user);
     }
 
 }
