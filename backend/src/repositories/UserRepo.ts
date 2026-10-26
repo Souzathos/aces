@@ -11,7 +11,23 @@ export class UserRepo {
         return this.userRepository.save(user);
     }
 
+    update(id: number, userData: Partial<User>) {
+        return this.userRepository.update(id, userData);
+    }
+
+    delete(id: string) {
+        this.userRepository.delete(id);
+    }
+
+    listAll() {
+        return this.userRepository.find();
+    }
+
     findByEmail(email: string) {
         return this.userRepository.findOneBy({ email });
+    }
+
+    findById(id: number) {
+        return this.userRepository.findOneBy({ id })
     }
 }   

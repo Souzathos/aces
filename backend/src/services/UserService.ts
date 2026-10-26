@@ -1,5 +1,5 @@
 
-import { ConflictError } from "../errors";
+import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { UserRoles } from "../models/roles/UserRoles";
 import { User } from "../models/User";
 import { UserRepo } from "../repositories/UserRepo";
@@ -47,6 +47,18 @@ export class UserService {
         } as User);
 
         return passwordHandler(user);
+    }
+
+    async update(id: number, userData: Partial<userDTO>) {
+        const userExists = await userRepo.findById(id);
+
+        if(!userExists) {
+            throw new NotFoundError("User not found");
+        }
+
+        const newUser = await userRepo.update(id, userData) 
+
+        return passwordHandler(newUser as any);
     }
 
 }
