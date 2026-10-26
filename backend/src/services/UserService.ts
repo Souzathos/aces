@@ -1,8 +1,9 @@
 
 import { ConflictError } from "../errors";
-import { UserRoles } from "../models/roles/UserRoles";
+import { UserRoles } from "../enums/UserRoles";
 import { User } from "../models/User";
 import { UserRepo } from "../repositories/UserRepo";
+import { hashPassword } from "../utils/PasswordUtils";
 
 type userDTO = { 
   cpf: string,
@@ -21,7 +22,6 @@ const userRepo = new UserRepo();
 function passwordHandler(user: User): User {
      
     delete (user as any).password;
-
     return user
 }
 
@@ -33,11 +33,13 @@ export class UserService {
         if (userExists) {
             throw new ConflictError("User already exists");
         }
+
+        const hashedPassword = await hashPassword(password);
         
         const user = await userRepo.create({ 
             name, 
             email, 
-            password,
+            password: hashedPassword,
             cpf,
             phone,
             address,
