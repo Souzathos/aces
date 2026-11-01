@@ -31,4 +31,8 @@ export class UserRepo {
     findById(id: number) {
         return this.userRepository.findOneBy({ id })
     }
+
+    findByCpf(cpf: string) {
+        return this.userRepository.findOneBy({ cpf });
+    }
 }   

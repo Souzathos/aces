@@ -1,17 +1,7 @@
 
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-} from "typeorm";
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany } from "typeorm";
 import { User } from "./User";
-import { MedicalHistory } from "./MedicalHistory";
 import { Review } from "./Review";
-import { Attendance } from "./Attendance";
-import { Presence } from "./Presence";
 
 @Entity("patients")
 export class Patient {
@@ -23,17 +13,9 @@ export class Patient {
 
   @OneToOne(() => User)
   @JoinColumn({ name: "id", referencedColumnName: "id" })
-  user!: User;
-
-  @OneToMany(() => MedicalHistory, (history) => history.patient)
-  medicalHistories!: MedicalHistory[];
+  user_id!: User;
 
   @OneToMany(() => Review, (review) => review.patient)
   reviews!: Review[];
 
-  @OneToMany(() => Attendance, (attendance) => attendance.patient)
-  attendances!: Attendance[];
-
-  @OneToMany(() => Presence, (presence) => presence.patient)
-  presences!: Presence[];
 }
