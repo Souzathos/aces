@@ -1,6 +1,6 @@
 
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, OneToOne } from "typeorm";
-import { UBS } from "./UBS";
+import { UBS } from "./Ubs";
 import { Review } from "./Review";
 import { User } from "./User";
 
@@ -11,6 +11,9 @@ export class Doctor {
 
   @Column({ type: "varchar", length: 20, unique: true })
   crm!: string;
+
+  @Column({ type: "varchar", length: 100 })
+  specialty!: string;
 
   @ManyToOne(() => UBS, (ubs) => ubs.doctors, {
     nullable: false,
