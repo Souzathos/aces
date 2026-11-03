@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
-import { UBS } from "../models/UBS";
+import { UBS } from "../models/Ubs";
 import { User } from "../models/User";
 import { Patient } from "../models/Patient";
 import { Doctor } from "../models/Doctor";
