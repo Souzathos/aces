@@ -1,6 +1,7 @@
 import { BadRequestError, NotFoundError } from "../errors";
 import { UserRepo } from "../repositories/UserRepo";
 import { comparePassword } from "../utils/PasswordUtils";
+import { generateToken } from "../utils/TokenUtils";
 
 
 export class AuthService {
@@ -18,8 +19,9 @@ export class AuthService {
         if (!isMatch) {
             throw new BadRequestError("Invalid credentials");
         }
-
+        
         delete (user as any).password;
+
         
         return user
     }

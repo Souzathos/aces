@@ -1,10 +1,5 @@
 
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Doctor } from "./Doctor";
 import { Attendance } from "./Attendance";
 
