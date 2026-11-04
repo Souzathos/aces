@@ -1,0 +1,42 @@
+import { AppDataSorce } from "../config/data-source";
+import { UpdateUserDTO } from "../dtos/user";
+import { User } from "../models/User";
+
+
+
+export class UserRepo {
+    private userRepository = AppDataSorce.getRepository(User);
+
+    create(user: User) {
+        this.userRepository.create(user);
+        return this.userRepository.save(user);
+    }
+
+    async update(id: number, userData: Partial<User>): Promise<User | null> {
+        const updatedUser = UpdateUserDTO.parse(userData);
+        if(updatedUser) {
+            await this.userRepository.update(id, updatedUser);
+        }
+        return this.findById(id);
+    }
+
+    delete(id: number) {
+        this.userRepository.delete(id);
+    }
+
+    listAll() {
+        return this.userRepository.find();
+    }
+
+    findByEmail(email: string) {
+        return this.userRepository.findOneBy({ email });
+    }
+
+    findById(id: number) {
+        return this.userRepository.findOneBy({ id })
+    }
+
+    findByCpf(cpf: string) {
+        return this.userRepository.findOneBy({ cpf });
+    }
+}   
