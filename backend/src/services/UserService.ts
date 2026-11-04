@@ -2,20 +2,8 @@
 import { ConflictError, NotFoundError } from "../errors";
 import { UserRoles } from "../enums/UserRoles";
 import { User } from "../models/User";
-import { UserRepo } from "../repositories/UserRepo";
+import { userDTO, UserRepo } from "../repositories/UserRepo";
 import { hashPassword } from "../utils/PasswordUtils";
-
-type userDTO = { 
-  cpf: string,
-  name: string,
-  email: string,
-  password: string,
-  phone: string | null,
-  address: string | null,
-  addressNumber: string | null,
-  postalCode: string | null,
-  role: UserRoles;
-};
 
 const userRepo = new UserRepo();
 

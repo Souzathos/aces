@@ -1,12 +1,22 @@
 import { ConflictError, NotFoundError } from "../errors";
+import { User } from "../models/User";
 import { PatientRepo, CreatePatientData, UpdatePatientData } from "../repositories/PatientRepo";
-import { UserRepo } from "../repositories/UserRepo";
+import { userDTO, UserRepo } from "../repositories/UserRepo";
 
 const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
 
 export class PatientService {
-  async create(patientData: CreatePatientData) {
+  async create(patientData: CreatePatientData, userData: userDTO) {
+    const userExists = await userRepo.findByCpf(patientData.cpf);
+    let userId:number | null = null;
+    
+    if (!userExists) {
+      const createdUser = await userRepo.create(userData as User);
+      userId = createdUser.id;
+    } else {
+      userId = userExists.id;
+    }
 
     const patientExists = await patientRepo.findByCpf(patientData.cpf);
 
@@ -14,7 +24,8 @@ export class PatientService {
       throw new ConflictError("Patient already exists");
     }
 
-    return patientRepo.create(patientData);
+    const patient = { ...patientData, user_id: userId } as CreatePatientData;
+    return patientRepo.create(patient);
   }
 
   async update(cpf: string, patientData: UpdatePatientData) {

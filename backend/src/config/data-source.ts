@@ -2,11 +2,6 @@ import "reflect-metadata";
 
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
-import { UBS } from "../models/UBS";
-import { User } from "../models/User";
-import { Patient } from "../models/Patient";
-import { Doctor } from "../models/Doctor";
-import { Review } from "../models/Review";
 
 dotenv.config();
 
@@ -21,5 +16,5 @@ export const AppDataSorce = new DataSource({
     host: DB_HOST,
     logging: true,
     synchronize: true,
-    entities: ["../models/*.ts"],
+    entities: ["src/models/*.ts"],
 });
