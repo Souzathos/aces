@@ -2,10 +2,8 @@
 import { CreateUserDTOType } from "../dtos/user";
 import { ConflictError, NotFoundError } from "../errors";
 import { User } from "../models/User";
-import { UserRepo } from "../repositories/UserRepo";
+import { userDTO, UserRepo } from "../repositories/UserRepo";
 import { hashPassword } from "../utils/PasswordUtils";
-
-
 
 const userRepo = new UserRepo();
 
