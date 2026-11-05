@@ -1,14 +1,16 @@
 import { CreatePatientDTOType, UpdatePatientDTOType } from "../dtos/patient";
+import { CreateUserDTOType } from "../dtos/user";
 import { ConflictError, NotFoundError } from "../errors";
+import { Patient } from "../models/Patient";
 import { User } from "../models/User";
-import { PatientRepo, CreatePatientData, UpdatePatientData } from "../repositories/PatientRepo";
-import { userDTO, UserRepo } from "../repositories/UserRepo";
+import { PatientRepo } from "../repositories/PatientRepo";
+import { UserRepo } from "../repositories/UserRepo";
 
 const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
 
 export class PatientService {
-  async create(patientData: CreatePatientData, userData: userDTO) {
+  async create(patientData: CreatePatientDTOType, userData: CreateUserDTOType) {
     const userExists = await userRepo.findByCpf(patientData.cpf);
     let userId:number | null = null;
     
@@ -25,7 +27,7 @@ export class PatientService {
       throw new ConflictError("Patient already exists");
     }
 
-    const patient = { ...patientData, user_id: userId } as CreatePatientData;
+    const patient = { ...patientData, user_id: userId } as CreatePatientDTOType;
     return patientRepo.create(patient);
   }
 

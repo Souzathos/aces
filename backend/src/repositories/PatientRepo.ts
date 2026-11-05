@@ -2,8 +2,6 @@ import { AppDataSorce } from "../config/data-source";
 import { CreatePatientDTOType, UpdatePatientDTOType } from "../dtos/patient";
 import { Patient } from "../models/Patient";
 
-
-
 export class PatientRepo {
   private patientRepository = AppDataSorce.getRepository(Patient);
 
