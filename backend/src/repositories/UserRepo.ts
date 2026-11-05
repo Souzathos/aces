@@ -1,18 +1,5 @@
 import { AppDataSorce } from "../config/data-source";
-import { UserRoles } from "../enums/UserRoles";
 import { User } from "../models/User";
-
-export type userDTO = { 
-  cpf: string,
-  name: string,
-  email: string,
-  password: string,
-  phone: string | null,
-  address: string | null,
-  addressNumber: string | null,
-  postalCode: string | null,
-  role: UserRoles;
-};
 
 export class UserRepo {
     private userRepository = AppDataSorce.getRepository(User);
@@ -23,7 +10,7 @@ export class UserRepo {
     }
 
     async update(id: number, userData: Partial<User>): Promise<User | null> {
-        const updatedUser = UpdateUserDTO.parse(userData);
+        const updatedUser = userData;
         if(updatedUser) {
             await this.userRepository.update(id, updatedUser);
         }
