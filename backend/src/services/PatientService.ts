@@ -1,3 +1,4 @@
+import { CreatePatientDTOType, UpdatePatientDTOType } from "../dtos/patient";
 import { ConflictError, NotFoundError } from "../errors";
 import { User } from "../models/User";
 import { PatientRepo, CreatePatientData, UpdatePatientData } from "../repositories/PatientRepo";
@@ -28,7 +29,7 @@ export class PatientService {
     return patientRepo.create(patient);
   }
 
-  async update(cpf: string, patientData: UpdatePatientData) {
+  async update(cpf: string, patientData: UpdatePatientDTOType) {
     const patientExists = await patientRepo.findByCpf(cpf);
 
     if (!patientExists) {

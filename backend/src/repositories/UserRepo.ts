@@ -23,7 +23,10 @@ export class UserRepo {
     }
 
     async update(id: number, userData: Partial<User>): Promise<User | null> {
-        await this.userRepository.update(id, userData);
+        const updatedUser = UpdateUserDTO.parse(userData);
+        if(updatedUser) {
+            await this.userRepository.update(id, updatedUser);
+        }
         return this.findById(id);
     }
 

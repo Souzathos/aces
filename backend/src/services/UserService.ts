@@ -1,20 +1,19 @@
 
+import { CreateUserDTOType } from "../dtos/user";
 import { ConflictError, NotFoundError } from "../errors";
-import { UserRoles } from "../enums/UserRoles";
 import { User } from "../models/User";
 import { userDTO, UserRepo } from "../repositories/UserRepo";
 import { hashPassword } from "../utils/PasswordUtils";
 
 const userRepo = new UserRepo();
 
-export type UpdateUserData = Partial<Omit<userDTO, "role">>;
 
 function passwordHandler({ password: _password, ...user }: User): Omit<User, "password"> {
     return user;
 }
 
 export class UserService {
-    async createUser({ name, email, password, cpf, phone, address, addressNumber, postalCode, role }: userDTO) {
+    async createUser({ name, email, password, cpf, phone, address, addressNumber, postalCode, role }: CreateUserDTOType) {
         
         const userExists = await userRepo.findByEmail(email);
 
@@ -39,7 +38,7 @@ export class UserService {
         return passwordHandler(user);
     }
 
-    async update(id: number, userData: UpdateUserData) {
+    async update(id: number, userData: Partial<User>) {
         const userExists = await userRepo.findById(id);
 
         if(!userExists) {
