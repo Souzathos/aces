@@ -8,13 +8,11 @@ export class AuthController {
     private authService = new AuthService();
 
     async login(req: Request, res: Response) {
-        const {email, password} = req.body
-
-        const user:User = await this.authService.login(email, password);
+        const user: User = await this.authService.login(req.body);
 
         const payload = {
             userId: Number(user.id),
-            email,
+            email: user.email,
             role: user.role.toString()
         }
 
