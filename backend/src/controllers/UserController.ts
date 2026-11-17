@@ -1,31 +1,26 @@
 import { Request, Response } from "express";
 import { BadRequestError } from "../errors";
 import { UserService } from "../services/UserService";
-import { UpdateUserDTOType } from "../dtos/user";
 import { UserRoles } from "../enums/UserRoles";
 
 
 export class UserController {
     private userService = new UserService();
 
-    async create(req: Request, res: Response ) {
-        const { name, email, password, cpf, phone, address, addressNumber, postalCode } = req.body ?? {};
+    async create(req: Request, res: Response) {
+        const user = await this.userService.createUser({ ...req.body, role: UserRoles.USER });
 
-        const user = await this.userService.createUser({ name, email, password, cpf, phone, address, addressNumber, postalCode, role: UserRoles.USER});
-        
         return res.status(201).json(user);
     }
 
-    async update(req: Request, res: Response) {
+    async update(req: Request<{ id: string }>, res: Response) {
         const id = Number(req.params.id);
 
         if (!req.params.id || !Number.isInteger(id)) {
             throw new BadRequestError("Invalid user id");
         }
 
-        const { name, email, password, cpf, phone, address, addressNumber, postalCode } = req.body;
-        const userData: UpdateUserDTOType = {};
-        const user = await this.userService.update(id, userData);
+        const user = await this.userService.update(id, req.body);
 
         return res.status(200).json(user);
     }

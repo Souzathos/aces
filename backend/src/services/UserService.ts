@@ -1,6 +1,6 @@
 
-import { CreateUserDTOType } from "../dtos/user";
-import { ConflictError, NotFoundError } from "../errors";
+import { CreateUserDTO, UpdateUserDTO } from "../dtos/user";
+import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { User } from "../models/User";
 import { UserRepo } from "../repositories/UserRepo";
 import { hashPassword } from "../utils/PasswordUtils";
@@ -13,7 +13,12 @@ function passwordHandler({ password: _password, ...user }: User): Omit<User, "pa
 }
 
 export class UserService {
-    async createUser({ name, email, password, cpf, phone, address, addressNumber, postalCode, role }: CreateUserDTOType) {
+    async createUser(data: unknown) {
+        const parsed = CreateUserDTO.safeParse(data ?? {});
+        if (!parsed.success) {
+            throw new BadRequestError(parsed.error.issues[0].message);
+        }
+        const { name, email, password, cpf, phone, address, addressNumber, postalCode, role } = parsed.data;
         
         const userExists = await userRepo.findByEmail(email);
 
@@ -38,7 +43,16 @@ export class UserService {
         return passwordHandler(user);
     }
 
-    async update(id: number, userData: Partial<User>) {
+    async update(id: number, data: unknown) {
+        const parsed = UpdateUserDTO.safeParse(data ?? {});
+        if (!parsed.success) {
+            throw new BadRequestError(parsed.error.issues[0].message);
+        }
+        const userData = parsed.data;
+        if (Object.keys(userData).length === 0) {
+            throw new BadRequestError("At least one user field must be provided");
+        }
+
         const userExists = await userRepo.findById(id);
 
         if(!userExists) {
