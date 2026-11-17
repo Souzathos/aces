@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { BadRequestError } from "../errors";
-import { CreatePatientData, UpdatePatientData } from "../repositories/PatientRepo";
 import { PatientService } from "../services/PatientService";
-import { userDTO } from "../repositories/UserRepo";
+import { CreateUserDTOType } from "../dtos/user";
 
 export class PatientController {
   private patientService = new PatientService();
@@ -13,7 +12,7 @@ export class PatientController {
     const patient = await this.patientService.create({
       cpf: cpf.trim(),
       bloodType,
-    }, user as userDTO);
+    }, user as CreateUserDTOType);
 
     return res.status(201).json(patient);
   }

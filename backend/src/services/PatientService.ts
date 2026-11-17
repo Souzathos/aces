@@ -10,8 +10,9 @@ const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
 
 export class PatientService {
-  async create(patientData: CreatePatientDTOType, userData: CreateUserDTOType) {
-    const userExists = await userRepo.findByCpf(patientData.cpf);
+  async create(patientData: Partial<CreatePatientDTOType>, userData: CreateUserDTOType) {
+    
+    const userExists = await userRepo.findByCpf(patientData.cpf as string);
     let userId:number | null = null;
     
     if (!userExists) {
@@ -21,7 +22,7 @@ export class PatientService {
       userId = userExists.id;
     }
 
-    const patientExists = await patientRepo.findByCpf(patientData.cpf);
+    const patientExists = await patientRepo.findByCpf(patientData.cpf as string);
 
     if (patientExists) {
       throw new ConflictError("Patient already exists");
