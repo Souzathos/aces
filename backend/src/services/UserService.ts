@@ -8,7 +8,7 @@ import { hashPassword } from "../utils/PasswordUtils";
 const userRepo = new UserRepo();
 
 
-function passwordHandler({ password: _password, ...user }: User): Omit<User, "password"> {
+export function passwordHandler({ password: _password, ...user }: User): Omit<User, "password"> {
     return user;
 }
 

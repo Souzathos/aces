@@ -15,7 +15,7 @@ type UpdatePatientRecord = {
 export class PatientRepo {
   private patientRepository = AppDataSorce.getRepository(Patient);
 
-  create({ cpf, bloodType, userId }: CreatePatientRecord) {
+  create(patientData: Patient) {
     const patient = this.patientRepository.create({
       cpf,
       bloodType: bloodType ?? null,
@@ -25,7 +25,7 @@ export class PatientRepo {
     return this.patientRepository.save(patient);
   }
 
-  async update(cpf: string, patientData: UpdatePatientRecord): Promise<Patient | null> {
+  async update(cpf: string, patientData: Partial<Patient>): Promise<Patient | null> {
     await this.patientRepository.update({ cpf }, patientData);
     return this.findByCpf(cpf);
   }

@@ -3,7 +3,7 @@ import { UserRoles } from "../enums/UserRoles";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { PatientRepo } from "../repositories/PatientRepo";
 import { UserRepo } from "../repositories/UserRepo";
-import { UserService } from "./UserService";
+import { passwordHandler } from "./UserService";
 
 const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
@@ -22,25 +22,12 @@ export class PatientService {
       throw new ConflictError("Patient already exists");
     }
 
-    // Se já existe um usuário com esse CPF, só vincula o paciente a ele.
-    // Senão, cria o usuário (com hash de senha e checagem de email) antes.
-    const existingUser = await userRepo.findByCpf(cpf);
-    const userId = existingUser
-      ? existingUser.id
-      : (await userService.createUser({ ...userData, cpf, role: UserRoles.USER })).id;
-
-    return patientRepo.create({ cpf, bloodType, userId });
+    const patient = { ...patientData, user_id: userId as Partial<Patient> } as Patient;
+    return patientRepo.create(patient);
   }
 
-  async update(cpf: string, data: unknown) {
-    const parsed = UpdatePatientDTO.safeParse(data ?? {});
-    if (!parsed.success) {
-      throw new BadRequestError(parsed.error.issues[0].message);
-    }
-    const patientData = parsed.data;
-    if (Object.keys(patientData).length === 0) {
-      throw new BadRequestError("At least one patient field must be provided");
-    }
+  async update(cpf: string, patientData: Partial<Patient>) {
+    const patientExists = await patientRepo.findByCpf(cpf);
 
     const { bloodType, ...userData } = patientData;
 
@@ -77,12 +64,22 @@ export class PatientService {
 
   async listByCpf(cpf: string) {
     const patient = await patientRepo.findByCpf(cpf);
+    const user = await userRepo.findById(Number(patient?.user_id))
 
     if (!patient) {
       throw new NotFoundError("Patient not found");
     }
 
-    return patient;
+    if(!user) {
+        throw new NotFoundError("The user of doctor not exists")
+    }
+
+    const safe = passwordHandler(user)
+
+    return {
+      patient,
+      safe
+    };
   }
 
   listAll() {
