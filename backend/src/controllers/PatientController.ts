@@ -18,24 +18,32 @@ export class PatientController {
     return res.status(201).json(patient);
   }
 
-  async update( req: Request,  res: Response) {
-    const cpf  = (req.params.cpf as string).trim();
+  async update(req: Request<PatientParams>, res: Response) {
+    const cpf = req.params.cpf?.trim();
+    if (!cpf) {
+      throw new BadRequestError("Invalid patient CPF");
+    }
 
-    const { bloodType } = req.body;
-
-    const patient = await this.patientService.update(cpf, { bloodType });
+    const patient = await this.patientService.update(cpf, req.body);
     return res.status(200).json(patient);
   }
 
-  async delete(req: Request, res: Response) {
-    const cpf = (req.params.cpf as string).trim();
+  async delete(req: Request<PatientParams>, res: Response) {
+    const cpf = req.params.cpf?.trim();
+    if (!cpf) {
+      throw new BadRequestError("Invalid patient CPF");
+    }
 
     await this.patientService.delete(cpf);
     return res.status(204).send();
   }
 
-  async listByCpf(req: Request, res: Response) {
-    const cpf = (req.params.cpf as string).trim();
+  async listByCpf(req: Request<PatientParams>, res: Response) {
+    const cpf = req.params.cpf?.trim();
+    if (!cpf) {
+      throw new BadRequestError("Invalid patient CPF");
+    }
+
     const patient = await this.patientService.listByCpf(cpf);
     return res.status(200).json(patient);
   }

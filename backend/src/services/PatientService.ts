@@ -1,30 +1,23 @@
-import { CreatePatientDTOType, UpdatePatientDTOType } from "../dtos/patient";
-import { CreateUserDTOType } from "../dtos/user";
-import { ConflictError, NotFoundError } from "../errors";
-import { Patient } from "../models/Patient";
-import { User } from "../models/User";
+import { CreatePatientDTO, UpdatePatientDTO } from "../dtos/patient";
+import { UserRoles } from "../enums/UserRoles";
+import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { PatientRepo } from "../repositories/PatientRepo";
 import { UserRepo } from "../repositories/UserRepo";
 import { passwordHandler } from "./UserService";
 
 const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
+const userService = new UserService();
 
 export class PatientService {
-  async create(patientData: Partial<CreatePatientDTOType>, userData: CreateUserDTOType) {
-    
-    const userExists = await userRepo.findByCpf(patientData.cpf as string);
-    let userId:number | null = null;
-    
-    if (!userExists) {
-      const createdUser = await userRepo.create(userData as User);
-      userId = createdUser.id;
-    } else {
-      userId = userExists.id;
+  async create(data: unknown) {
+    const parsed = CreatePatientDTO.safeParse(data ?? {});
+    if (!parsed.success) {
+      throw new BadRequestError(parsed.error.issues[0].message);
     }
+    const { cpf, bloodType, ...userData } = parsed.data;
 
-    const patientExists = await patientRepo.findByCpf(patientData.cpf as string);
-
+    const patientExists = await patientRepo.findByCpf(cpf);
     if (patientExists) {
       throw new ConflictError("Patient already exists");
     }
@@ -36,11 +29,21 @@ export class PatientService {
   async update(cpf: string, patientData: Partial<Patient>) {
     const patientExists = await patientRepo.findByCpf(cpf);
 
-    if (!patientExists) {
+    const { bloodType, ...userData } = patientData;
+
+    const userId = await patientRepo.findUserIdByCpf(cpf);
+    if (userId === null) {
       throw new NotFoundError("Patient not found");
     }
 
-    const updatedPatient = await patientRepo.update(cpf, patientData);
+    if (Object.keys(userData).length > 0) {
+      await userService.update(userId, userData);
+    }
+
+    const updatedPatient =
+      bloodType !== undefined
+        ? await patientRepo.update(cpf, { bloodType })
+        : await patientRepo.findByCpf(cpf);
 
     if (!updatedPatient) {
       throw new NotFoundError("Patient not found");
