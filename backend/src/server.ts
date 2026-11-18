@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { AppDataSorce } from "./config/data-source";
+import { AppDataSource } from "./config/data-source";
 import * as dotenv from "dotenv";
 import route from "./routes/index.routes";
 
@@ -14,7 +14,7 @@ app.use("/api", route);
 
 const Port = Number(process.env.PORT) || 3000;
 
-AppDataSorce.initialize().then(() => {
+AppDataSource.initialize().then(() => {
     console.log("Database initialized")
 
     app.listen(Port, () => {

@@ -1,4 +1,4 @@
-import { AppDataSorce } from "../config/data-source";
+import { AppDataSource } from "../config/data-source";
 import { Patient } from "../models/Patient";
 import { User } from "../models/User";
 
@@ -13,7 +13,7 @@ type UpdatePatientRecord = {
 };
 
 export class PatientRepo {
-  private patientRepository = AppDataSorce.getRepository(Patient);
+  private patientRepository = AppDataSource.getRepository(Patient);
 
   create({ cpf, bloodType, userId }: CreatePatientRecord) {
     const patient = this.patientRepository.create({

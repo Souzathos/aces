@@ -7,6 +7,9 @@ export class UBS {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ type: "varchar", length: 100 })
+  name!: string;
+  
   @Column({ type: "int", default: 0 })
   patientCount!: number;
 

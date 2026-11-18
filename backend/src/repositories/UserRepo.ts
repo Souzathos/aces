@@ -1,10 +1,10 @@
-import { AppDataSorce } from "../config/data-source";
+import { AppDataSource } from "../config/data-source";
 import { User } from "../models/User";
 
 
 
 export class UserRepo {
-    private userRepository = AppDataSorce.getRepository(User);
+    private userRepository = AppDataSource.getRepository(User);
 
     create(user: User) {
         this.userRepository.create(user);

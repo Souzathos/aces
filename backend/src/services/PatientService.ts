@@ -1,4 +1,4 @@
-import { CreatePatientDTO, UpdatePatientDTO } from "../dtos/patient";
+import { CreatePatientDTO, CreatePatientDTOType, UpdatePatientDTO, UpdatePatientDTOType } from "../dtos/patient";
 import { UserRoles } from "../enums/UserRoles";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { PatientRepo } from "../repositories/PatientRepo";
@@ -10,7 +10,7 @@ const userRepo = new UserRepo();
 const userService = new UserService();
 
 export class PatientService {
-  async create(data: unknown) {
+  async create(data: CreatePatientDTOType) {
     const parsed = CreatePatientDTO.safeParse(data ?? {});
     if (!parsed.success) {
       throw new BadRequestError(parsed.error.issues[0].message);
@@ -32,7 +32,7 @@ export class PatientService {
     return patientRepo.create({ cpf, bloodType, userId });
   }
 
-  async update(cpf: string, data: unknown) {
+  async update(cpf: string, data: UpdatePatientDTOType) {
     const parsed = UpdatePatientDTO.safeParse(data ?? {});
     if (!parsed.success) {
       throw new BadRequestError(parsed.error.issues[0].message);
