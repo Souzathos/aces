@@ -1,5 +1,4 @@
 import { AppDataSorce } from "../config/data-source";
-import { UpdateUserDTO } from "../dtos/user";
 import { User } from "../models/User";
 
 
@@ -13,15 +12,12 @@ export class UserRepo {
     }
 
     async update(id: number, userData: Partial<User>): Promise<User | null> {
-        const updatedUser = UpdateUserDTO.parse(userData);
-        if(updatedUser) {
-            await this.userRepository.update(id, updatedUser);
-        }
+        await this.userRepository.update(id, userData);
         return this.findById(id);
     }
 
     delete(id: number) {
-        this.userRepository.delete(id);
+        return this.userRepository.delete(id);
     }
 
     listAll() {

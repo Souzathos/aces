@@ -25,5 +25,4 @@ export class UBS {
   @OneToMany(() => Doctor, (doctor) => doctor.ubs)
   doctors!: Doctor[];
 
-
 }

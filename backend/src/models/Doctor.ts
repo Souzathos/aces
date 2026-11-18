@@ -1,6 +1,6 @@
 
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, OneToOne } from "typeorm";
-import { UBS } from "./Ubs";
+import { UBS } from "./UBS";
 import { Review } from "./Review";
 import { User } from "./User";
 
