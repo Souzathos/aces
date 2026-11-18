@@ -5,7 +5,7 @@ import { Patient } from "../models/Patient";
 export class PatientRepo {
   private patientRepository = AppDataSorce.getRepository(Patient);
 
-  create(patientData: CreatePatientDTOType) {
+  create(patientData: Patient) {
     const patient = this.patientRepository.create({
       ...patientData,
       bloodType: patientData.bloodType ?? null,
@@ -14,7 +14,7 @@ export class PatientRepo {
     return this.patientRepository.save(patient);
   }
 
-  async update(cpf: string, patientData: UpdatePatientDTOType): Promise<Patient | null> {
+  async update(cpf: string, patientData: Partial<Patient>): Promise<Patient | null> {
     await this.patientRepository.update({ cpf }, patientData);
     return this.findByCpf(cpf);
   }

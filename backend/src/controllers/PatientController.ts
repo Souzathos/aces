@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { BadRequestError } from "../errors";
 import { PatientService } from "../services/PatientService";
 import { CreateUserDTOType } from "../dtos/user";
+import { User } from "../models/User";
 
 export class PatientController {
   private patientService = new PatientService();
@@ -12,7 +13,7 @@ export class PatientController {
     const patient = await this.patientService.create({
       cpf: cpf.trim(),
       bloodType,
-    }, user as CreateUserDTOType);
+    }, user);
 
     return res.status(201).json(patient);
   }

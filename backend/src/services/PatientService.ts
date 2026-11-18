@@ -5,6 +5,7 @@ import { Patient } from "../models/Patient";
 import { User } from "../models/User";
 import { PatientRepo } from "../repositories/PatientRepo";
 import { UserRepo } from "../repositories/UserRepo";
+import { passwordHandler } from "./UserService";
 
 const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
@@ -28,11 +29,11 @@ export class PatientService {
       throw new ConflictError("Patient already exists");
     }
 
-    const patient = { ...patientData, user_id: userId } as CreatePatientDTOType;
+    const patient = { ...patientData, user_id: userId as Partial<Patient> } as Patient;
     return patientRepo.create(patient);
   }
 
-  async update(cpf: string, patientData: UpdatePatientDTOType) {
+  async update(cpf: string, patientData: Partial<Patient>) {
     const patientExists = await patientRepo.findByCpf(cpf);
 
     if (!patientExists) {
@@ -60,12 +61,22 @@ export class PatientService {
 
   async listByCpf(cpf: string) {
     const patient = await patientRepo.findByCpf(cpf);
+    const user = await userRepo.findById(Number(patient?.user_id))
 
     if (!patient) {
       throw new NotFoundError("Patient not found");
     }
 
-    return patient;
+    if(!user) {
+        throw new NotFoundError("The user of doctor not exists")
+    }
+
+    const safe = passwordHandler(user)
+
+    return {
+      patient,
+      safe
+    };
   }
 
   listAll() {
