@@ -18,4 +18,51 @@ export class DoctorController {
     return res.status(201).json(doctor);
   }
 
+  async update(req: Request, res: Response) {
+    const { crm, specialty, ubs } = req.body;
+    
+    const doctor = await this.doctorService.update(
+      crm,
+      {
+        specialty,
+        ubs
+      }
+    )
+    
+    return res.status(201).json(
+      doctor
+    )
+  }
+
+  async delete(req: Request, res: Response) {
+    const { crm } = req.body;
+    
+    await this.doctorService.delete(crm);
+    
+    return res.status(204)
+  }
+
+  async listAll(req: Request, res: Response) {
+
+    const doctors = await this.doctorService.listAll()
+
+    return res.status(200).json(
+      doctors
+    )
+  }
+
+  async listByCrm(req: Request, res: Response) {
+    const { crm } = req.body;
+
+    const { doctor, safe } = await this.doctorService.listByCrm(crm);
+
+    return res.status(200).json(
+      {
+        doctor,
+        safe
+      }
+    )
+  };
+
+
 }

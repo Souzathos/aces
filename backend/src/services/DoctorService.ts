@@ -57,7 +57,7 @@ export class DoctorService {
     await doctorRepo.delete(crm)
   }
 
-  async listByCpf(crm: string) {
+  async listByCrm(crm: string) {
     const doctor: Doctor | null = await doctorRepo.findByCrm(crm)
     const user = await userRepo.findById(Number(doctor?.user_id))
 
