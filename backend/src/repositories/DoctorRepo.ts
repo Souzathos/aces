@@ -14,9 +14,9 @@ export class DoctorRepo {
     return this.doctorRepository.save(doctor);
   }
 
-  async update(crm: string, doctorData: Partial<Doctor>) {
-    await this.doctorRepository.update({ crm }, doctorData);
-    return this.findByCrm(crm);
+  async update(id: number, doctorData: Partial<Doctor>) {
+    await this.doctorRepository.update(id, doctorData);
+    return this.findById(id);
   }
 
   async delete(crm: string) {
@@ -27,7 +27,20 @@ export class DoctorRepo {
     return this.doctorRepository.find();
   }
 
+  findById(id: number) {
+    return this.doctorRepository.findOneBy({ id });
+  }
+
   findByCrm(crm: string) {
     return this.doctorRepository.findOneBy({ crm });
+  }
+
+  async findByCpf(cpf: string) {
+    const doctor = await this.doctorRepository.findOne({
+      where: { user: { cpf } },
+      relations: { user: true },
+    });
+
+    return doctor ?? null;
   }
 }

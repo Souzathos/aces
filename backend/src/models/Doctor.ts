@@ -9,6 +9,9 @@ export class Doctor {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ length: 14, unique: true  })
+  cpf!: string;
+
   @Column({ type: "varchar", length: 20, unique: true })
   crm!: string;
 
@@ -16,14 +19,13 @@ export class Doctor {
   specialty!: string;
 
   @ManyToOne(() => UBS, (ubs) => ubs.doctors, {
-    nullable: false,
+    nullable: true,
   })
   @JoinColumn({ name: "ubs_id" })
-  ubs!: UBS;
+  ubs!: UBS | null;
 
-  @OneToOne(() => User)
-  @JoinColumn({ name: "id", referencedColumnName: "id" })
-  user_id!: User;
+  @OneToOne(() => User, (user) => user.doctor)
+  user: User;
 
   @OneToMany(() => Review, (review) => review.doctor)
   reviews!: Review[];

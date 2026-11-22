@@ -1,88 +1,80 @@
+import { Patient } from './../models/Patient';
 import { CreatePatientDTO, UpdatePatientDTO } from "../dtos/patient";
 import { UserRoles } from "../enums/UserRoles";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
+import { User } from "../models/User";
 import { PatientRepo } from "../repositories/PatientRepo";
 import { UserRepo } from "../repositories/UserRepo";
 import { passwordHandler } from "./UserService";
 
 const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
-const userService = new UserService();
 
 export class PatientService {
-  async create(data: unknown) {
-    const parsed = CreatePatientDTO.safeParse(data ?? {});
-    if (!parsed.success) {
-      throw new BadRequestError(parsed.error.issues[0].message);
-    }
-    const { cpf, bloodType, ...userData } = parsed.data;
-
+  async create(patientData: Partial<Patient>, cpf: string) {
     const patientExists = await patientRepo.findByCpf(cpf);
+
     if (patientExists) {
       throw new ConflictError("Patient already exists");
     }
 
-    const patient = { ...patientData, user_id: userId as Partial<Patient> } as Patient;
-    return patientRepo.create(patient);
+    const user = await userRepo.findByCpf(cpf);
+    
+    if (!user) {
+      throw new ConflictError("Doctor already exists");
+    }
+    
+    patientData.user = user;
+
+    const createdPatient = await patientRepo.create(patientData as Patient);
+    const safe = passwordHandler(createdPatient.user)
+
+    return {...createdPatient, user: safe};
   }
 
-  async update(cpf: string, patientData: Partial<Patient>) {
-    const patientExists = await patientRepo.findByCpf(cpf);
-
-    const { bloodType, ...userData } = patientData;
-
-    const userId = await patientRepo.findUserIdByCpf(cpf);
-    if (userId === null) {
-      throw new NotFoundError("Patient not found");
-    }
-
-    if (Object.keys(userData).length > 0) {
-      await userService.update(userId, userData);
-    }
-
-    const updatedPatient =
-      bloodType !== undefined
-        ? await patientRepo.update(cpf, { bloodType })
-        : await patientRepo.findByCpf(cpf);
-
-    if (!updatedPatient) {
-      throw new NotFoundError("Patient not found");
-    }
-
-    return updatedPatient;
-  }
-
-  async delete(cpf: string) {
-    const patientExists = await patientRepo.findByCpf(cpf);
+  async update(id: number, patientData: Partial<Patient>) {
+    const { bloodType } = patientData;
+    const patientExists = await patientRepo.findById(id);
 
     if (!patientExists) {
       throw new NotFoundError("Patient not found");
     }
 
-    await patientRepo.delete(cpf);
+    const updatedPatient = await patientRepo.update(id, { bloodType })
+    const safe = passwordHandler(updatedPatient?.user as User)
+
+    return {...updatedPatient, user: safe};
+  }
+
+  async delete(id: number) {
+    const patientExists = await patientRepo.findById(id);
+
+    if (!patientExists) {
+      throw new NotFoundError("Patient not found");
+    }
+
+    await patientRepo.delete(id);
   }
 
   async listByCpf(cpf: string) {
-    const patient = await patientRepo.findByCpf(cpf);
-    const user = await userRepo.findById(Number(patient?.user_id))
+    const patient = await patientRepo.findByCpf(cpf)
 
     if (!patient) {
       throw new NotFoundError("Patient not found");
     }
+    const safe = passwordHandler(patient.user)
 
-    if(!user) {
-        throw new NotFoundError("The user of doctor not exists")
-    }
-
-    const safe = passwordHandler(user)
-
-    return {
-      patient,
-      safe
-    };
+    return {...patient,  safe};
   }
 
-  listAll() {
-    return patientRepo.listAll();
+  async listAll() {
+    let patients = await patientRepo.listAll();
+
+    patients = patients.map((patient) => {
+      const user = passwordHandler(patient.user)
+      return {...patient, user} as Patient
+    });
+
+    return patients;
   }
 }

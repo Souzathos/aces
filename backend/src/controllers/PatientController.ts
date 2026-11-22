@@ -3,46 +3,38 @@ import { BadRequestError } from "../errors";
 import { PatientService } from "../services/PatientService";
 import { CreateUserDTOType } from "../dtos/user";
 import { User } from "../models/User";
+import { Patient } from "../models/Patient";
 
 export class PatientController {
   private patientService = new PatientService();
 
   async create(req: Request, res: Response) {
-    const { cpf, bloodType, user } = req.body;
+    const { cpf, bloodType } = req.body;
 
-    const patient = await this.patientService.create({
-      cpf: cpf.trim(),
-      bloodType,
-    }, user);
+    const patientData:Partial<Patient> = { bloodType }; // Não completo
+
+    const patient = await this.patientService.create(patientData, cpf);
 
     return res.status(201).json(patient);
   }
 
-  async update(req: Request<PatientParams>, res: Response) {
-    const cpf = req.params.cpf?.trim();
-    if (!cpf) {
-      throw new BadRequestError("Invalid patient CPF");
-    }
+  async update(req: Request, res: Response) {
+    const id = Number(req.params.id);
+    const patientData = req.body;
 
-    const patient = await this.patientService.update(cpf, req.body);
+    const patient = await this.patientService.update(id, patientData);
     return res.status(200).json(patient);
   }
 
-  async delete(req: Request<PatientParams>, res: Response) {
-    const cpf = req.params.cpf?.trim();
-    if (!cpf) {
-      throw new BadRequestError("Invalid patient CPF");
-    }
+  async delete(req: Request, res: Response) {
+    const id = Number(req.params.id);
 
-    await this.patientService.delete(cpf);
+    await this.patientService.delete(id);
     return res.status(204).send();
   }
 
-  async listByCpf(req: Request<PatientParams>, res: Response) {
-    const cpf = req.params.cpf?.trim();
-    if (!cpf) {
-      throw new BadRequestError("Invalid patient CPF");
-    }
+  async listByCpf(req: Request, res: Response) {
+    const cpf = (req.params.cpf as string).trim();
 
     const patient = await this.patientService.listByCpf(cpf);
     return res.status(200).json(patient);
