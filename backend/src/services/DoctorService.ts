@@ -10,74 +10,87 @@ const doctorRepo = new DoctorRepo();
 const userRepo = new UserRepo();
 
 export class DoctorService {
-  async create(doctorData: Partial<Doctor>, userData: User) {
-    const userExists = await userRepo.findByCpf(userData.cpf as string);
-    let userId:number | null = null;
-    
-    if (!userExists) {
-      const createdUser = await userRepo.create(userData as User);
-      userId = createdUser.id;
-    } else {
-      userId = userExists.id;
-    }
-
+  async create(doctorData: Partial<Doctor>, cpf: string) {
     const doctorExists = await doctorRepo.findByCrm(doctorData.crm as string);
 
     if (doctorExists) {
-      throw new ConflictError("Patient already exists");
+      throw new ConflictError("Doctor already exists");
     }
 
-    const patient = { ...doctorData, user_id: userId as Partial<User> } as Doctor;
-    return doctorRepo.create(patient);
+    const user = await userRepo.findByCpf(cpf);
+
+    if (!user) {
+      throw new ConflictError("Doctor already exists");
+    }
+
+    doctorData.user = user;
+
+    const createdDoctor = await doctorRepo.create(doctorData as Doctor);
+
+    const safe = passwordHandler(createdDoctor.user)
+
+    return {...createdDoctor, user: safe};
   }
 
-  async update(crm: string, doctorData: Partial<Doctor>) {
-    const doctorExists = await doctorRepo.findByCrm(crm);
+  async update(id: number, doctorData: Partial<Doctor>) {
+    const doctorExists = await doctorRepo.findById(id);
 
     if (!doctorExists) {
       throw new NotFoundError("Doctor not found");
     }
 
-    const updatedDoctor = await doctorRepo.update(crm, doctorData);
+    const updatedDoctor = await doctorRepo.update(id, doctorData);
 
-    if (!updatedDoctor) {
-      throw new NotFoundError("Doctor not found");
-    }
+    const safe = passwordHandler(updatedDoctor?.user as User)
 
-    return updatedDoctor;
+    return {...updatedDoctor, user: safe};
   }
 
   async delete(crm: string) {
     const doctorExists = await doctorRepo.findByCrm(crm);
-
+    
     if (!doctorExists) {
       throw new NotFoundError("Doctor not found");
     }
 
     await doctorRepo.delete(crm)
+
+    return
   }
 
   async listByCrm(crm: string) {
     const doctor: Doctor | null = await doctorRepo.findByCrm(crm)
-    const user = await userRepo.findById(Number(doctor?.user_id))
-
+    
     if(!doctor) {
         throw new NotFoundError("Doctor not found")
     }
 
-    if(!user) {
-        throw new NotFoundError("The user of doctor not exists")
-    }
+    const safe = passwordHandler(doctor.user)
 
-    const safe = passwordHandler(user)
-
-    return {
-      doctor,
-      safe
-    };
+    return {...doctor, user: safe};
   }
 
-  listAll() {
-    return doctorRepo.listAll();
+  async listByCpf(cpf: string) {
+    const doctor = await doctorRepo.findByCpf(cpf)
+
+    if (!doctor) {
+      throw new NotFoundError("doctor not found");
+    }
+
+    const safe = passwordHandler(doctor.user)
+
+    return {...doctor,  safe};
+  }
+    
+
+  async listAll() {
+    let doctors = await doctorRepo.listAll();
+    
+    doctors = doctors.map((doctor) => {
+      const user = passwordHandler(doctor.user)
+      return {...doctor, user} as Doctor
+    });
+
+    return doctors;
   }
 }

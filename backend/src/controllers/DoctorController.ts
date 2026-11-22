@@ -7,62 +7,58 @@ export class DoctorController {
   private doctorService = new DoctorService();
 
   async create(req: Request, res: Response) {
-    const { crm, specialty, ubs, user } = req.body;
+    const { crm, cpf, specialty, ubs } = req.body;
 
     const doctor = await this.doctorService.create({
       crm: crm.trim(),
       specialty,
-      ubs
-    }, user as User);
+      ubs,
+      
+    }, cpf);
 
     return res.status(201).json(doctor);
   }
 
   async update(req: Request, res: Response) {
-    const { crm, specialty, ubs } = req.body;
+    const { specialty, ubs } = req.body;
+    const id = Number  (req.params.id);
     
     const doctor = await this.doctorService.update(
-      crm,
+      id,
       {
         specialty,
         ubs
       }
-    )
+    );
     
     return res.status(201).json(
       doctor
-    )
+    );
   }
 
   async delete(req: Request, res: Response) {
-    const { crm } = req.body;
+    const crm = req.params.crm as string;
     
     await this.doctorService.delete(crm);
     
-    return res.status(204)
+    return res.status(204);
   }
 
   async listAll(req: Request, res: Response) {
-
-    const doctors = await this.doctorService.listAll()
+    const doctors = await this.doctorService.listAll();
 
     return res.status(200).json(
       doctors
-    )
+    );
   }
 
   async listByCrm(req: Request, res: Response) {
-    const { crm } = req.body;
+    const crm = req.params.crm as string;
 
-    const { doctor, safe } = await this.doctorService.listByCrm(crm);
+    const doctor = await this.doctorService.listByCrm(crm);
 
     return res.status(200).json(
-      {
-        doctor,
-        safe
-      }
-    )
-  };
-
-
+      doctor
+    );
+  }
 }

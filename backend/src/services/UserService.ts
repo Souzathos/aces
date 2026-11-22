@@ -109,4 +109,15 @@ export class UserService {
         return passwordHandler(user);
     }
 
+    async listByCpf(cpf: string) {
+
+        const user = await userRepo.findByCpf(cpf);
+
+        if(!user) {
+            throw new NotFoundError("User not found");
+        }
+
+        return passwordHandler(user);
+    }
+
 }

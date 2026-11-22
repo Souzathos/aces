@@ -1,3 +1,4 @@
+import { partial } from "zod/mini";
 import { AppDataSorce } from "../config/data-source";
 import { Patient } from "../models/Patient";
 import { User } from "../models/User";
@@ -16,38 +17,36 @@ export class PatientRepo {
   private patientRepository = AppDataSorce.getRepository(Patient);
 
   create(patientData: Patient) {
-    const patient = this.patientRepository.create({
-      cpf,
-      bloodType: bloodType ?? null,
-      user_id: { id: userId } as User,
-    });
+    const patient = this.patientRepository.create(
+      patientData
+    );
 
     return this.patientRepository.save(patient);
   }
 
-  async update(cpf: string, patientData: Partial<Patient>): Promise<Patient | null> {
-    await this.patientRepository.update({ cpf }, patientData);
-    return this.findByCpf(cpf);
+  async update(id: number, patientData: Partial<Patient>): Promise<Patient | null> {
+    await this.patientRepository.update({ id }, patientData);
+    return this.findById(id);
   }
 
-  async delete(cpf: string): Promise<void> {
-    await this.patientRepository.delete({ cpf });
+  async delete(id: number): Promise<void> {
+    await this.patientRepository.delete({ id });
   }
 
   listAll() {
     return this.patientRepository.find();
   }
 
-  findByCpf(cpf: string) {
-    return this.patientRepository.findOneBy({ cpf });
+  findById(id: number) {
+    return this.patientRepository.findOneBy({ id });
   }
 
-  async findUserIdByCpf(cpf: string): Promise<number | null> {
+  async findByCpf(cpf: string) {
     const patient = await this.patientRepository.findOne({
-      where: { cpf },
-      relations: { user_id: true },
+      where: { user: { cpf } },
+      relations: { user: true },
     });
 
-    return patient?.user_id?.id ?? null;
+    return patient ?? null;
   }
 }
