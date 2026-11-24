@@ -11,9 +11,9 @@ export class PatientController {
   async create(req: Request, res: Response) {
     const { cpf, bloodType } = req.body;
 
-    const patientData:Partial<Patient> = { bloodType }; // Não completo
+    const patientData:Partial<Patient> = { bloodType, cpf }; // Não completo
 
-    const patient = await this.patientService.create(patientData, cpf);
+    const patient = await this.patientService.create(patientData);
 
     return res.status(201).json(patient);
   }

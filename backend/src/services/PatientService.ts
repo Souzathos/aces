@@ -11,17 +11,17 @@ const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
 
 export class PatientService {
-  async create(patientData: Partial<Patient>, cpf: string) {
-    const patientExists = await patientRepo.findByCpf(cpf);
+  async create(patientData: Partial<Patient>) {
+    const patientExists = await patientRepo.findByCpf(patientData.cpf as string);
 
     if (patientExists) {
       throw new ConflictError("Patient already exists");
     }
 
-    const user = await userRepo.findByCpf(cpf);
+    const user = await userRepo.findByCpf(patientData.cpf as string);
     
     if (!user) {
-      throw new ConflictError("Doctor already exists");
+      throw new ConflictError("User not found");
     }
     
     patientData.user = user;
@@ -41,9 +41,8 @@ export class PatientService {
     }
 
     const updatedPatient = await patientRepo.update(id, { bloodType })
-    const safe = passwordHandler(updatedPatient?.user as User)
-
-    return {...updatedPatient, user: safe};
+    
+    return updatedPatient;
   }
 
   async delete(id: number) {
@@ -64,16 +63,11 @@ export class PatientService {
     }
     const safe = passwordHandler(patient.user)
 
-    return {...patient,  safe};
+    return {...patient,  user: safe};
   }
 
   async listAll() {
     let patients = await patientRepo.listAll();
-
-    patients = patients.map((patient) => {
-      const user = passwordHandler(patient.user)
-      return {...patient, user} as Patient
-    });
 
     return patients;
   }

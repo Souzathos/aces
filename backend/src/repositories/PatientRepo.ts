@@ -3,16 +3,6 @@ import { AppDataSorce } from "../config/data-source";
 import { Patient } from "../models/Patient";
 import { User } from "../models/User";
 
-type CreatePatientRecord = {
-  cpf: string;
-  bloodType?: string | null;
-  userId: number;
-};
-
-type UpdatePatientRecord = {
-  bloodType?: string | null;
-};
-
 export class PatientRepo {
   private patientRepository = AppDataSorce.getRepository(Patient);
 

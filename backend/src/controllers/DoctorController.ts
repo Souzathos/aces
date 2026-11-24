@@ -13,8 +13,8 @@ export class DoctorController {
       crm: crm.trim(),
       specialty,
       ubs,
-      
-    }, cpf);
+      cpf
+      });
 
     return res.status(201).json(doctor);
   }
@@ -37,11 +37,11 @@ export class DoctorController {
   }
 
   async delete(req: Request, res: Response) {
-    const crm = req.params.crm as string;
+    const id = Number(req.params.id);
     
-    await this.doctorService.delete(crm);
+    await this.doctorService.delete(id);
     
-    return res.status(204);
+    return res.status(204).send();
   }
 
   async listAll(req: Request, res: Response) {
