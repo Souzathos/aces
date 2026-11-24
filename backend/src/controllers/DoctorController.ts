@@ -61,4 +61,18 @@ export class DoctorController {
       doctor
     );
   }
+
+  async listByCpf(req: Request, res: Response) {
+    const cpf = (req.params.cpf as string).trim();
+
+    const doctor = await this.doctorService.listByCpf(cpf);
+    return res.status(200).json(doctor);
+  }
+
+  async listById(req: Request, res: Response) {
+    const id = Number(req.params.id);
+
+    const doctor = await this.doctorService.listById(id);
+    return res.status(200).json(doctor);
+  }
 }

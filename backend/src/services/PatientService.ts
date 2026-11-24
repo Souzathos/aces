@@ -66,6 +66,16 @@ export class PatientService {
     return {...patient,  user: safe};
   }
 
+  async listById(id: number) {
+      const patient = await patientRepo.findById(id)
+  
+      if (!patient) {
+        throw new NotFoundError("Patient not found");
+      }
+  
+      return patient;
+    }
+
   async listAll() {
     let patients = await patientRepo.listAll();
 

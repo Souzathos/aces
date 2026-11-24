@@ -61,21 +61,29 @@ export class DoctorService {
         throw new NotFoundError("Doctor not found")
     }
 
-    const safe = passwordHandler(doctor.user)
-
-    return {...doctor, user: safe};
+    return doctor;
   }
 
   async listByCpf(cpf: string) {
     const doctor = await doctorRepo.findByCpf(cpf)
 
     if (!doctor) {
-      throw new NotFoundError("doctor not found");
+      throw new NotFoundError("Doctor not found");
     }
 
     const safe = passwordHandler(doctor.user)
 
     return {...doctor,  user: safe};
+  }
+
+  async listById(id: number) {
+    const doctor = await doctorRepo.findById(id)
+
+    if (!doctor) {
+      throw new NotFoundError("Doctor not found");
+    }
+
+    return doctor;
   }
     
 

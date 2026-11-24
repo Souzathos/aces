@@ -44,4 +44,11 @@ export class PatientController {
     const patients = await this.patientService.listAll();
     return res.status(200).json(patients);
   }
+
+  async listById(req: Request, res: Response) {
+    const id = Number(req.params.id);
+
+    const patient = await this.patientService.listById(id);
+    return res.status(200).json(patient);
+  }
 }
