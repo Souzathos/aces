@@ -19,8 +19,8 @@ export class DoctorRepo {
     return this.findById(id);
   }
 
-  async delete(crm: string) {
-    await this.doctorRepository.delete({ crm });
+  async delete(id: number) {
+    await this.doctorRepository.delete({ id });
   }
 
   listAll() {

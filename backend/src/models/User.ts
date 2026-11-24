@@ -36,11 +36,11 @@ export class User {
   @Column({ default: UserRoles.USER })
   role!: string;
 
-  @OneToOne(() => Patient, (patient) => patient.user)
+  @OneToOne(() => Patient, (patient) => patient.user, { onDelete: "SET NULL" })
   @JoinColumn({ name: 'patient_cpf' })
   patient: Patient;
 
-  @OneToOne(() => Doctor, (doctor) => doctor.user)
+  @OneToOne(() => Doctor, (doctor) => doctor.user, { onDelete: "SET NULL" })
   @JoinColumn({ name: 'doctor_cpf' })
-  doctor?: Doctor;
+  doctor: Doctor;
 }

@@ -10,17 +10,17 @@ const doctorRepo = new DoctorRepo();
 const userRepo = new UserRepo();
 
 export class DoctorService {
-  async create(doctorData: Partial<Doctor>, cpf: string) {
+  async create(doctorData: Partial<Doctor>) {
     const doctorExists = await doctorRepo.findByCrm(doctorData.crm as string);
 
     if (doctorExists) {
       throw new ConflictError("Doctor already exists");
     }
 
-    const user = await userRepo.findByCpf(cpf);
+    const user = await userRepo.findByCpf(doctorData.cpf as string);
 
     if (!user) {
-      throw new ConflictError("Doctor already exists");
+      throw new ConflictError("User not found");
     }
 
     doctorData.user = user;
@@ -41,21 +41,17 @@ export class DoctorService {
 
     const updatedDoctor = await doctorRepo.update(id, doctorData);
 
-    const safe = passwordHandler(updatedDoctor?.user as User)
-
-    return {...updatedDoctor, user: safe};
+    return updatedDoctor;
   }
 
-  async delete(crm: string) {
-    const doctorExists = await doctorRepo.findByCrm(crm);
-    
+  async delete(id: number) {
+    const doctorExists = await doctorRepo.findById(id);
+
     if (!doctorExists) {
       throw new NotFoundError("Doctor not found");
     }
 
-    await doctorRepo.delete(crm)
-
-    return
+    await doctorRepo.delete(id);
   }
 
   async listByCrm(crm: string) {
@@ -79,17 +75,12 @@ export class DoctorService {
 
     const safe = passwordHandler(doctor.user)
 
-    return {...doctor,  safe};
+    return {...doctor,  user: safe};
   }
     
 
   async listAll() {
     let doctors = await doctorRepo.listAll();
-    
-    doctors = doctors.map((doctor) => {
-      const user = passwordHandler(doctor.user)
-      return {...doctor, user} as Doctor
-    });
 
     return doctors;
   }
