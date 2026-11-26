@@ -1,8 +1,6 @@
-import { Patient } from './../models/Patient';
-import { CreatePatientDTO, UpdatePatientDTO } from "../dtos/patient";
-import { UserRoles } from "../enums/UserRoles";
+import { Patient } from "../models/Patient";
+import { CreatePatientDTO, CreatePatientDTOType, UpdatePatientDTO, UpdatePatientDTOType } from "../dtos/patient";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
-import { User } from "../models/User";
 import { PatientRepo } from "../repositories/PatientRepo";
 import { UserRepo } from "../repositories/UserRepo";
 import { passwordHandler } from "./UserService";
@@ -11,37 +9,49 @@ const patientRepo = new PatientRepo();
 const userRepo = new UserRepo();
 
 export class PatientService {
-  async create(patientData: Partial<Patient>) {
-    const patientExists = await patientRepo.findByCpf(patientData.cpf as string);
+  async create(data: Pick<CreatePatientDTOType, "cpf" | "bloodType">) {
+    const parsed = CreatePatientDTO.pick({ cpf: true, bloodType: true }).safeParse(data ?? {});
+    if (!parsed.success) {
+      throw new BadRequestError(parsed.error.issues[0].message);
+    }
+    const { cpf, bloodType } = parsed.data;
+
+    const patientExists = await patientRepo.findByCpf(cpf);
 
     if (patientExists) {
       throw new ConflictError("Patient already exists");
     }
 
-    const user = await userRepo.findByCpf(patientData.cpf as string);
-    
+    const user = await userRepo.findByCpf(cpf);
+
     if (!user) {
-      throw new ConflictError("User not found");
+      throw new NotFoundError("User not found");
     }
-    
-    patientData.user = user;
 
-    const createdPatient = await patientRepo.create(patientData as Patient);
-    const safe = passwordHandler(createdPatient.user)
+    const createdPatient = await patientRepo.create({ cpf, bloodType, user } as Patient);
+    const safe = passwordHandler(createdPatient.user);
 
-    return {...createdPatient, user: safe};
+    return { ...createdPatient, user: safe };
   }
 
-  async update(id: number, patientData: Partial<Patient>) {
-    const { bloodType } = patientData;
+  async update(id: number, data: UpdatePatientDTOType) {
+    const parsed = UpdatePatientDTO.safeParse(data ?? {});
+    if (!parsed.success) {
+      throw new BadRequestError(parsed.error.issues[0].message);
+    }
+    const { bloodType } = parsed.data;
+    if (bloodType === undefined) {
+      throw new BadRequestError("At least one patient field must be provided");
+    }
+
     const patientExists = await patientRepo.findById(id);
 
     if (!patientExists) {
       throw new NotFoundError("Patient not found");
     }
 
-    const updatedPatient = await patientRepo.update(id, { bloodType })
-    
+    const updatedPatient = await patientRepo.update(id, { bloodType });
+
     return updatedPatient;
   }
 
@@ -56,28 +66,28 @@ export class PatientService {
   }
 
   async listByCpf(cpf: string) {
-    const patient = await patientRepo.findByCpf(cpf)
+    const patient = await patientRepo.findByCpf(cpf);
 
     if (!patient) {
       throw new NotFoundError("Patient not found");
     }
-    const safe = passwordHandler(patient.user)
+    const safe = passwordHandler(patient.user);
 
-    return {...patient,  user: safe};
+    return { ...patient, user: safe };
   }
 
   async listById(id: number) {
-      const patient = await patientRepo.findById(id)
-  
-      if (!patient) {
-        throw new NotFoundError("Patient not found");
-      }
-  
-      return patient;
+    const patient = await patientRepo.findById(id);
+
+    if (!patient) {
+      throw new NotFoundError("Patient not found");
     }
 
+    return patient;
+  }
+
   async listAll() {
-    let patients = await patientRepo.listAll();
+    const patients = await patientRepo.listAll();
 
     return patients;
   }

@@ -1,12 +1,16 @@
 
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Doctor } from "./Doctor";
+import { Patient } from "./Patient";
 
 @Entity("ubs")
 export class UBS {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ type: "varchar", length: 100 })
+  name!: string;
+  
   @Column({ type: "int", default: 0 })
   patientCount!: number;
 
@@ -25,4 +29,6 @@ export class UBS {
   @OneToMany(() => Doctor, (doctor) => doctor.ubs)
   doctors!: Doctor[];
 
+  @OneToMany(() => Patient, (patient) => patient.ubs)
+  patients!: Patient[];
 }

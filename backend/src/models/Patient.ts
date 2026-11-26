@@ -1,7 +1,8 @@
 
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 import { Review } from "./Review";
+import { UBS } from "./UBS";
 
 @Entity("patients")
 export class Patient {
@@ -20,4 +21,9 @@ export class Patient {
   @OneToMany(() => Review, (review) => review.patient)
   reviews!: Review[];
 
+  @ManyToOne(() => UBS, (ubs) => ubs.patients, {
+    nullable: true,
+  })
+  @JoinColumn({ name: "ubs_id" })
+  ubs!: UBS | null;
 }

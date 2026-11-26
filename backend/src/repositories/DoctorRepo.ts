@@ -1,10 +1,10 @@
-import { AppDataSorce } from "../config/data-source";
+import { AppDataSource } from "../config/data-source";
 import { CreateDoctorDTOType } from "../dtos/doctor";
 import { Doctor } from "../models/Doctor";
 
 
 export class DoctorRepo {
-  private doctorRepository = AppDataSorce.getRepository(Doctor);
+  private doctorRepository = AppDataSource.getRepository(Doctor);
 
   create(doctorData: Doctor) {
     const doctor = this.doctorRepository.create({

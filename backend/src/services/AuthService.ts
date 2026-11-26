@@ -1,14 +1,14 @@
 import { BadRequestError, NotFoundError } from "../errors";
 import { UserRepo } from "../repositories/UserRepo";
 import { comparePassword } from "../utils/PasswordUtils";
-import { LoginDTO } from "../dtos/auth";
+import { LoginDTO, LoginDTOType } from "../dtos/auth";
 import { generateToken } from "../utils/TokenUtils";
 
 
 export class AuthService {
     private userRepo = new UserRepo();
 
-    async login(data: unknown) {
+    async login(data: LoginDTOType) {
         const parsed = LoginDTO.safeParse(data ?? {});
         if (!parsed.success) {
             throw new BadRequestError(parsed.error.issues[0].message);

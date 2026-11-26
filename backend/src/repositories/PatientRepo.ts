@@ -1,10 +1,9 @@
-import { partial } from "zod/mini";
-import { AppDataSorce } from "../config/data-source";
+import { AppDataSource } from "../config/data-source";
 import { Patient } from "../models/Patient";
 import { User } from "../models/User";
 
 export class PatientRepo {
-  private patientRepository = AppDataSorce.getRepository(Patient);
+  private patientRepository = AppDataSource.getRepository(Patient);
 
   create(patientData: Patient) {
     const patient = this.patientRepository.create(
@@ -33,8 +32,7 @@ export class PatientRepo {
 
   async findByCpf(cpf: string) {
     const patient = await this.patientRepository.findOne({
-      where: { user: { cpf } },
-      relations: { user: true },
+      where: { cpf }
     });
 
     return patient ?? null;

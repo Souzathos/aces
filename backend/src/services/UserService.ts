@@ -1,5 +1,5 @@
 
-import { CreateUserDTO, UpdateUserDTO } from "../dtos/user";
+import { CreateUserDTO, CreateUserDTOType, UpdateUserDTO, UpdateUserDTOType } from "../dtos/user";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors";
 import { User } from "../models/User";
 import { UserRepo } from "../repositories/UserRepo";
@@ -13,7 +13,7 @@ export function passwordHandler({ password: _password, ...user }: User): Omit<Us
 }
 
 export class UserService {
-    async createUser(data: unknown) {
+    async createUser(data: CreateUserDTOType) {
         const parsed = CreateUserDTO.safeParse(data ?? {});
         if (!parsed.success) {
             throw new BadRequestError(parsed.error.issues[0].message);
@@ -43,7 +43,7 @@ export class UserService {
         return passwordHandler(user);
     }
 
-    async update(id: number, data: unknown) {
+    async update(id: number, data: UpdateUserDTOType) {
         const parsed = UpdateUserDTO.safeParse(data ?? {});
         if (!parsed.success) {
             throw new BadRequestError(parsed.error.issues[0].message);

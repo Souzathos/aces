@@ -9,11 +9,7 @@ export class PatientController {
   private patientService = new PatientService();
 
   async create(req: Request, res: Response) {
-    const { cpf, bloodType } = req.body;
-
-    const patientData:Partial<Patient> = { bloodType, cpf }; // Não completo
-
-    const patient = await this.patientService.create(patientData);
+    const patient = await this.patientService.create(req.body);
 
     return res.status(201).json(patient);
   }
