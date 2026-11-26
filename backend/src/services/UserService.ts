@@ -8,7 +8,7 @@ import { hashPassword } from "../utils/PasswordUtils";
 const userRepo = new UserRepo();
 
 
-function passwordHandler({ password: _password, ...user }: User): Omit<User, "password"> {
+export function passwordHandler({ password: _password, ...user }: User): Omit<User, "password"> {
     return user;
 }
 
@@ -101,6 +101,17 @@ export class UserService {
     async listById(id: number) {
 
         const user = await userRepo.findById(id);
+
+        if(!user) {
+            throw new NotFoundError("User not found");
+        }
+
+        return passwordHandler(user);
+    }
+
+    async listByCpf(cpf: string) {
+
+        const user = await userRepo.findByCpf(cpf);
 
         if(!user) {
             throw new NotFoundError("User not found");
