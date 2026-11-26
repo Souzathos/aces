@@ -1,35 +1,17 @@
 import { AppDataSource } from "../config/data-source";
 import { UBS } from "../models/UBS";
 
-type CreateUBSRecord = {
-  patientCount: number;
-  employeeCount: number;
-  address: string;
-  addressNumber: string;
-  postalCode: string;
-};
+type CreateUBSRecord = Pick<UBS, "name" | "patientCount" | "employeeCount" | "address" | "addressNumber" | "postalCode">;
 
-type UpdateUBSRecord = {
-  patientCount?: number;
-  employeeCount?: number;
-  address?: string;
-  addressNumber?: string;
-  postalCode?: string;
-};
+
+type UpdateUBSRecord = Partial<CreateUBSRecord>;
+
 
 export class UbsRepo {
     private ubsRepository = AppDataSource.getRepository(UBS);
 
-    create({patientCount, employeeCount, address, addressNumber, postalCode}: CreateUBSRecord) {
-
-        const ubs = this.ubsRepository.create({
-            patientCount,
-            employeeCount,
-            address,
-            addressNumber,
-            postalCode
-        });
-
+    create(data: CreateUBSRecord) {
+        const ubs = this.ubsRepository.create(data);
         return this.ubsRepository.save(ubs);
     }
 

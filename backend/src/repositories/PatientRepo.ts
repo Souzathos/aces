@@ -32,8 +32,7 @@ export class PatientRepo {
 
   async findByCpf(cpf: string) {
     const patient = await this.patientRepository.findOne({
-      where: { user: { cpf } },
-      relations: { user: true },
+      where: { cpf }
     });
 
     return patient ?? null;
